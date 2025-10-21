@@ -1,0 +1,18 @@
+[
+    {
+        "qname": "ilab1.cs.rutgers.edu",
+        "qtype": 1
+    },
+    {
+        "qname": "ilab1.cs.rutgers.edu",
+        "qtype": 28
+    },
+    {
+        "qname": "whale.stanford.edu",
+        "qtype": 28
+    },
+    {
+        "qname": "www.princeton.edu",
+        "qtype": 1
+    }
+]
