@@ -3,7 +3,7 @@ import struct
 import random
 import json
 
-# Example query spec as JSON
+
 dns_query_spec = {
     "id": random.randint(0, 65535),
     "qr": 0,      # query
@@ -11,7 +11,7 @@ dns_query_spec = {
     "rd": 1,      # recursion desired
     "questions": [
         {
-            "qname": "princeton.edu",
+            "qname": "cs.rutgers.edu",
             "qtype": 2,   # NS record
             "qclass": 1   # IN
         }

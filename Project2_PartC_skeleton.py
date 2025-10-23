@@ -136,19 +136,19 @@ def parse_rr(data, offset):
     rtype = type_map.get(atype, str(atype))
 
     record = {
-        "hostname": name,   # owner name of the RR
+        "hostname": name,   
         "ttl": ttl,
         "atype": atype,
         "rtype": rtype,
-        "ip": None,         # filled for A/AAAA
-        "nsname": None      # filled for NS/CNAME (a domain-name rdata)
+        "ip": None,         
+        "nsname": None      
     }
 
     if atype == 1 and rdlength == 4:              # A
         record["ip"] = socket.inet_ntop(socket.AF_INET, rdata)
     elif atype == 28 and rdlength == 16:          # AAAA
         record["ip"] = socket.inet_ntop(socket.AF_INET6, rdata)
-    elif atype in (2, 5):                         # NS or CNAME -> domain name in RDATA
+    elif atype in (2, 5):                         
         dname, _ = parse_name(data, rdata_offset)
         record["nsname"] = dname
 
@@ -167,12 +167,12 @@ def dns_query(query_spec, server=("1.1.1.1", 53)):
 
 
 def iterative_resolve(query_spec):
-    # Start from a root server
-    servers = ["198.41.0.4"]  # a.root-servers.net
+    
+    servers = ["198.41.0.4"]  
     print("root servers", servers)
 
     qname = query_spec["questions"][0]["qname"]
-    qtype = query_spec["questions"][0]["qtype"]  # 1=A, 28=AAAA, 2=NS
+    qtype = query_spec["questions"][0]["qtype"]  
     steps = []
 
     for _ in range(20):  # safety cap
@@ -188,7 +188,7 @@ def iterative_resolve(query_spec):
             # try next server if any
             continue
 
-        # If final answer present (A/AAAA and matches qname + type), return it
+       
         final = [rr for rr in resp.get("answers", [])
                  if rr.get("hostname") == qname and rr.get("ip") and rr.get("atype") == qtype]
         if final:
@@ -202,7 +202,7 @@ def iterative_resolve(query_spec):
                 "raw": resp
             }
 
-        # CNAME chain: update qname and restart from root
+        
         cname_rrs = [rr for rr in resp.get("answers", []) if rr.get("rtype") == "CNAME" and rr.get("nsname")]
         if cname_rrs:
             qname = cname_rrs[0]["nsname"]
@@ -210,14 +210,14 @@ def iterative_resolve(query_spec):
             servers = ["198.41.0.4"]
             continue
 
-        # Referral: pick NS names from Authority and glue IPs from Additional
+        
         ns_names = [rr["nsname"] for rr in resp.get("authorities", [])
                     if rr.get("rtype") == "NS" and rr.get("nsname")]
         if ns_names:
             glue_ips = [rr["ip"] for rr in resp.get("additionals", [])
                         if rr.get("ip") and rr.get("hostname") in ns_names and rr.get("rtype") in ("A", "AAAA")]
             if glue_ips:
-                servers = glue_ips[:]  # follow the first glue next iteration
+                servers = glue_ips[:]  
                 continue
             else:
                 return {"error": "No glue found", "authorities": resp.get("authorities", []), "steps": steps}

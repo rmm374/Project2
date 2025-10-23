@@ -147,7 +147,7 @@ if __name__ == "__main__":
     try:
         result = dns_query(dns_query_spec, server=(args.server, args.port))
         print(json.dumps(result, indent=2))
-        # If your parse_response fills answers, this will show just the IPs:
+        
         if "answers" in result and result["answers"]:
             ips = [a.get("ip") for a in result["answers"] if a.get("ip")]
             if ips:
